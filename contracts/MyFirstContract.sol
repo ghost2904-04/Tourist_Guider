@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 contract MyFirstContract {
     string public message;
 
-    // Constructor runs only once at the time of deployment
+    
     constructor(string memory _message) {
         message = _message;
     }
