@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tourist Chatbot</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #chatbox { border: 1px solid #ccc; padding: 10px; width: 400px; height: 300px; overflow-y: auto; }
+    .msg { margin: 5px 0; }
+    .user { color: blue; }
+    .bot { color: green; }
+    #inputArea { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Tourist Chatbot</h2>
+  <div id="chatbox"></div>
+
+  <div id="inputArea">
+    <input type="text" id="message" placeholder="Type your message..." style="width: 300px;">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    const userId = localStorage.getItem("userId");
+
+    async function sendMessage() {
+      const msg = document.getElementById("message").value;
+      if (!msg) return;
+
+      // Show user message in chatbox
+      document.getElementById("chatbox").innerHTML += `<div class="msg user"><b>You:</b> ${msg}</div>`;
+      document.getElementById("message").value = "";
+
+      // Call backend
+      const res = await fetch("http://localhost:3000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, message: msg })
+      });
+
+      const data = await res.json();
+
+      // Show bot reply
+      document.getElementById("chatbox").innerHTML += `<div class="msg bot"><b>Bot:</b> ${data.reply}</div>`;
+
+      // Auto scroll down
+      const chatbox = document.getElementById("chatbox");
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+  </script>
+</body>
+</html>

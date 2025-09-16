@@ -4,7 +4,6 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 // Signup function
 async function signup() {
   const email = document.getElementById("email").value;
@@ -15,6 +14,7 @@ async function signup() {
     alert("Signup error: " + error.message);
   } else {
     alert("Signup successful! Check your email for confirmation.");
+    // You usually keep them on login page until email confirmed
   }
 }
 
@@ -27,12 +27,21 @@ async function login() {
   if (error) {
     alert("Login failed: " + error.message);
   } else {
-    // Show dashboard
-    document.getElementById("auth").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
-    document.getElementById("user-info").textContent = "Logged in as " + email;
+    const user = data.user;  // ✅ get logged in user
+
+    if (user) {
+      // ✅ Save userId so chatbot.html can use it
+      localStorage.setItem("userId", user.id);
+
+      // ✅ Redirect to chatbot
+      window.location.href = "chatbot.html";
+    } else {
+      alert("No user returned from Supabase!");
+    }
   }
 }
+
+
 const resetEmail = document.getElementById('reset-email');
 const resetBtn = document.getElementById('reset-btn');
 
