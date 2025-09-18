@@ -1,0 +1,4 @@
+// config.js
+export const SUPABASE_URL = "https://martdbudgoflarqthipw.supabase.co";
+export const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hcnRkYnVkZ29mbGFycXRoaXB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMzg0NzcsImV4cCI6MjA3MzcxNDQ3N30.XxB8CbFakk_SJBvIC873k8vTh9z82VC1OKG-xQtRMWE";
+export const GOOGLE_MAPS_API_KEY = "AIzaSyB9JtaoGZvW33eY4XrbXYHpKZGrl3YyFBY";
