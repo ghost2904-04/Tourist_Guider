@@ -360,12 +360,19 @@
   </div>
 
   <!-- Supabase SDK -->
+   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // Configuration
     const SUPABASE_URL = "https://martdbudgoflarqthipw.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hcnRkYnVkZ29mbGFycXRoaXB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMzg0NzcsImV4cCI6MjA3MzcxNDQ3N30.XxB8CbFakk_SJBvIC873k8vTh9z82VC1OKG-xQtRMWE";
 
+    const contractAddress = "0xYourContractAddress"; // replace with actual deployed address
+    const contractABI = [
+  // paste your ABI here (from leader's contract compile)
+    ];
+    
+    
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -379,6 +386,33 @@
     let currentUser = null;
 
     // Utility functions
+
+    async function connectWallet() {
+  if (!window.ethereum) throw new Error("MetaMask not installed");
+  await window.ethereum.request({ method: 'eth_requestAccounts' });
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  return { signer, provider };
+}
+
+// Generate blockchain Digital ID
+async function generateBlockchainId() {
+  const { signer } = await connectWallet();
+  const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+  // First preview (callStatic) — gets return value without spending gas
+  const previewHex = await contract.callStatic.generateRandomHex({
+    value: ethers.utils.parseEther("0.0001")
+  });
+
+  // Then actual transaction (costs 0.0001 ETH)
+  const tx = await contract.generateRandomHex({
+    value: ethers.utils.parseEther("0.0001")
+  });
+  await tx.wait();
+
+  return previewHex;
+}
     function showNotification(message, type = 'info') {
       notificationEl.className = `notification ${type}`;
       notificationEl.textContent = message;
@@ -544,6 +578,7 @@
         }
 
         updateProgress(60);
+        
 
         // Create digital ID
         const digitalId = {

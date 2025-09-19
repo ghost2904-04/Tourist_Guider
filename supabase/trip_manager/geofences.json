@@ -1,0 +1,107 @@
+[
+  {
+    "city": "Cuttack",
+    "zones": [
+      {
+        "zone_name": "Badambadi",
+        "safety_score": 25,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Badambadi\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.856,20.478],[85.857,20.478],[85.857,20.480],[85.856,20.480],[85.856,20.478]]]}}"
+      },
+      {
+        "zone_name": "College Square",
+        "safety_score": 41,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"College Square\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.845,20.464],[85.846,20.464],[85.846,20.466],[85.845,20.466],[85.845,20.464]]]}}"
+      },
+      {
+        "zone_name": "CDA Sector 6",
+        "safety_score": 58,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"CDA Sector 6\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.849,20.500],[85.850,20.500],[85.850,20.502],[85.849,20.502],[85.849,20.500]]]}}"
+      },
+      {
+        "zone_name": "Choudwar",
+        "safety_score": 76,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Choudwar\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.875,20.532],[85.876,20.532],[85.876,20.534],[85.875,20.534],[85.875,20.532]]]}}"
+      },
+      {
+        "zone_name": "Jagatpur",
+        "safety_score": 32,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Jagatpur\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.882,20.485],[85.883,20.485],[85.883,20.487],[85.882,20.487],[85.882,20.485]]]}}"
+      },
+      {
+        "zone_name": "Naya Sarak",
+        "safety_score": 67,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Naya Sarak\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.830,20.473],[85.831,20.473],[85.831,20.475],[85.830,20.475],[85.830,20.473]]]}}"
+      }
+    ]
+  },
+  {
+    "city": "Puri",
+    "zones": [
+      {
+        "zone_name": "Grand Road",
+        "safety_score": 19,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Grand Road\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.818,19.810],[85.819,19.810],[85.819,19.812],[85.818,19.812],[85.818,19.810]]]}}"
+      },
+      {
+        "zone_name": "Sea Beach",
+        "safety_score": 70,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Sea Beach\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.826,19.797],[85.827,19.797],[85.827,19.800],[85.826,19.800],[85.826,19.797]]]}}"
+      },
+      {
+        "zone_name": "Swargadwar",
+        "safety_score": 53,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Swargadwar\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.818,19.799],[85.819,19.799],[85.819,19.801],[85.818,19.801],[85.818,19.799]]]}}"
+      },
+      {
+        "zone_name": "Station Road",
+        "safety_score": 45,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Station Road\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.820,19.821],[85.821,19.821],[85.821,19.823],[85.820,19.823],[85.820,19.821]]]}}"
+      },
+      {
+        "zone_name": "Baliapanda",
+        "safety_score": 27,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Baliapanda\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.820,19.789],[85.821,19.789],[85.821,19.791],[85.820,19.791],[85.820,19.789]]]}}"
+      },
+      {
+        "zone_name": "Chakratirtha",
+        "safety_score": 61,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Chakratirtha\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.831,19.818],[85.832,19.818],[85.832,19.820],[85.831,19.820],[85.831,19.818]]]}}"
+      }
+    ]
+  },
+  {
+    "city": "Kolkata",
+    "zones": [
+      {
+        "zone_name": "Park Street",
+        "safety_score": 36,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Park Street\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[88.349,22.549],[88.350,22.549],[88.350,22.551],[88.349,22.551],[88.349,22.549]]]}}"
+      },
+      {
+        "zone_name": "Salt Lake",
+        "safety_score": 22,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Salt Lake\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[88.418,22.579],[88.419,22.579],[88.419,22.581],[88.418,22.581],[88.418,22.579]]]}}"
+      },
+      {
+        "zone_name": "Howrah",
+        "safety_score": 75,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Howrah\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[88.320,22.586],[88.321,22.586],[88.321,22.588],[88.320,22.588],[88.320,22.586]]]}}"
+      },
+      {
+        "zone_name": "New Town",
+        "safety_score": 48,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"New Town\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[88.480,22.598],[88.481,22.598],[88.481,22.600],[88.480,22.600],[88.480,22.598]]]}}"
+      },
+      {
+        "zone_name": "Behala",
+        "safety_score": 59,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Behala\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[88.312,22.501],[88.313,22.501],[88.313,22.503],[88.312,22.503],[88.312,22.501]]]}}"
+      },
+      {
+        "zone_name": "Dum Dum",
+        "safety_score": 30,
+        "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Dum Dum\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[88.415,22.629],[88.416,22.629],[88.416,22.631],[88.415,22.631],[88.415,22.629]]]}}"
+      }
+    ]
+  }
+]
