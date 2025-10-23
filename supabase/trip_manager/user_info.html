@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tourist Profile - Tourist Safety System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .header .subtitle {
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    .form-container {
+      padding: 2.5rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #555;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: #fafafa;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+
+    .form-group input:valid {
+      border-color: #28a745;
+    }
+
+    .required::after {
+      content: ' *';
+      color: #dc3545;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .notification {
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      font-weight: 500;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .notification.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .notification.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .notification.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #e0e0e0;
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .logout-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .info-card {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border-left: 4px solid #667eea;
+    }
+
+    .info-card h3 {
+      color: #667eea;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-card p {
+      color: #666;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .form-container {
+        padding: 1.5rem;
+      }
+
+      .header {
+        padding: 1.5rem;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container fade-in">
+    <div class="header">
+      <button class="logout-btn" onclick="logout()">Logout</button>
+      <h1>🛡️ Tourist Profile</h1>
+      <p class="subtitle">Complete your safety profile to access all features</p>
+    </div>
+
+    <div class="form-container">
+      <!-- Notification area -->
+      <div id="notification" class="notification hidden"></div>
+
+      <!-- Info card -->
+      <div class="info-card">
+        <h3>🔒 Why do we need this information?</h3>
+        <p>Your profile information helps us create a secure digital identity and ensures your safety during travel. All data is encrypted and stored securely.</p>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="progress-bar">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+
+      <form id="profile-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="full_name" class="required">Full Name</label>
+            <input id="full_name" type="text" placeholder="Enter your full name" required>
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input id="phone" type="tel" placeholder="Enter your phone number">
+          </div>
+
+          <div class="form-group">
+            <label for="nationality">Nationality</label>
+            <input id="nationality" type="text" placeholder="Enter your nationality">
+          </div>
+
+          <div class="form-group">
+            <label for="passport">Passport Number</label>
+            <input id="passport" type="text" placeholder="Enter passport number">
+          </div>
+
+          <div class="form-group">
+            <label for="dob" class="required">Date of Birth</label>
+            <input id="dob" type="date" required>
+          </div>
+
+          <div class="form-group">
+            <label for="kyc_number" class="required">KYC Number</label>
+            <input id="kyc_number" type="text" placeholder="Enter KYC number" required>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="emergency">Emergency Contact</label>
+            <input id="emergency" type="text" placeholder="Enter emergency contact information">
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">
+          <span class="btn-text">Create Profile & Digital ID</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Supabase SDK -->
+   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Configuration
+    const SUPABASE_URL = "https://martdbudgoflarqthipw.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hcnRkYnVkZ29mbGFycXRoaXB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMzg0NzcsImV4cCI6MjA3MzcxNDQ3N30.XxB8CbFakk_SJBvIC873k8vTh9z82VC1OKG-xQtRMWE";
+
+    const contractAddress = "0xYourContractAddress"; // replace with actual deployed address
+    const contractABI = [
+  // paste your ABI here (from leader's contract compile)
+    ];
+    
+    
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // DOM Elements
+    const form = document.getElementById("profile-form");
+    const notificationEl = document.getElementById("notification");
+    const progressEl = document.getElementById("progress-fill");
+    const submitBtn = document.getElementById("submit-btn");
+
+    let isLoading = false;
+    let currentUser = null;
+
+    // Utility functions
+
+    async function connectWallet() {
+  if (!window.ethereum) throw new Error("MetaMask not installed");
+  await window.ethereum.request({ method: 'eth_requestAccounts' });
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  return { signer, provider };
+}
+
+// Generate blockchain Digital ID
+async function generateBlockchainId() {
+  const { signer } = await connectWallet();
+  const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+  // First preview (callStatic) — gets return value without spending gas
+  const previewHex = await contract.callStatic.generateRandomHex({
+    value: ethers.utils.parseEther("0.0001")
+  });
+
+  // Then actual transaction (costs 0.0001 ETH)
+  const tx = await contract.generateRandomHex({
+    value: ethers.utils.parseEther("0.0001")
+  });
+  await tx.wait();
+
+  return previewHex;
+}
+    function showNotification(message, type = 'info') {
+      notificationEl.className = `notification ${type}`;
+      notificationEl.textContent = message;
+      notificationEl.classList.remove('hidden');
+      notificationEl.classList.add('show');
+      
+      setTimeout(() => {
+        notificationEl.classList.remove('show');
+        setTimeout(() => notificationEl.classList.add('hidden'), 300);
+      }, 5000);
+    }
+
+    function updateProgress(percentage) {
+      progressEl.style.width = percentage + '%';
+    }
+
+    function setLoading(loading) {
+      isLoading = loading;
+      
+      if (loading) {
+        submitBtn.innerHTML = '<span class="loading"></span>Creating Profile...';
+        submitBtn.disabled = true;
+      } else {
+        submitBtn.innerHTML = '<span class="btn-text">Create Profile & Digital ID</span>';
+        submitBtn.disabled = false;
+      }
+    }
+
+    function validateForm() {
+      const fullName = document.getElementById("full_name").value.trim();
+      const dob = document.getElementById("dob").value;
+      const kycNumber = document.getElementById("kyc_number").value.trim();
+
+      if (!fullName) {
+        showNotification('Full name is required', 'error');
+        return false;
+      }
+
+      if (!dob) {
+        showNotification('Date of birth is required', 'error');
+        return false;
+      }
+
+      if (!kycNumber) {
+        showNotification('KYC number is required', 'error');
+        return false;
+      }
+
+      // Validate age (must be at least 18)
+      const birthDate = new Date(dob);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      
+      if (age < 18) {
+        showNotification('You must be at least 18 years old to create a profile', 'error');
+        return false;
+      }
+
+      return true;
+    }
+
+    async function logout() {
+      try {
+        await db.auth.signOut();
+        localStorage.removeItem("userId");
+        window.location.href = "./index.html";
+      } catch (error) {
+        console.error("Logout error:", error);
+        showNotification("Error during logout: " + error.message, 'error');
+      }
+    }
+
+    // Check authentication and existing profile
+    window.addEventListener("DOMContentLoaded", async () => {
+      updateProgress(10);
+
+      try {
+        const { data: { user }, error: userError } = await db.auth.getUser();
+
+        if (!user) {
+          showNotification('Please log in to access this page', 'error');
+          setTimeout(() => {
+            window.location.href = "./index.html";
+          }, 2000);
+          return;
+        }
+
+        currentUser = user;
+        updateProgress(30);
+
+        // Check if profile already exists
+        const { data, error } = await db
+          .from("tourist_profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
+        updateProgress(50);
+
+        if (data && !error) {
+          // Profile exists, redirect to trip manager
+          showNotification('Profile already exists! Redirecting to trip manager...', 'success');
+          updateProgress(100);
+          
+          setTimeout(() => {
+            window.location.href = "./trip_manager.html";
+          }, 2000);
+        } else {
+          // No profile exists, show form
+          updateProgress(60);
+          showNotification('Welcome! Please complete your profile below.', 'info');
+          updateProgress(100);
+        }
+
+      } catch (error) {
+        console.error('Error checking authentication:', error);
+        showNotification('Error loading profile. Please try again.', 'error');
+        updateProgress(0);
+      }
+    });
+
+    // Form submission
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (isLoading) return;
+
+      if (!validateForm()) return;
+
+      if (!currentUser) {
+        showNotification('Authentication error. Please log in again.', 'error');
+        setTimeout(() => {
+          window.location.href = "./index.html";
+        }, 2000);
+        return;
+      }
+
+      setLoading(true);
+      updateProgress(0);
+
+      try {
+        // Create profile object
+        const profile = {
+          id: currentUser.id,
+          full_name: document.getElementById("full_name").value.trim(),
+          phone: document.getElementById("phone").value.trim(),
+          nationality: document.getElementById("nationality").value.trim(),
+          passport_number: document.getElementById("passport").value.trim(),
+          dob: document.getElementById("dob").value,
+          kyc_number: document.getElementById("kyc_number").value.trim(),
+          emergency_contact: document.getElementById("emergency").value.trim()
+        };
+
+        updateProgress(25);
+
+        // Insert profile
+        const { error: profileError } = await db
+          .from("tourist_profiles")
+          .insert(profile);
+
+        if (profileError) {
+          throw new Error(`Profile creation failed: ${profileError.message}`);
+        }
+
+        updateProgress(60);
+        
+
+        // Create digital ID
+        const digitalId = {
+          tourist_profile_id: currentUser.id,
+          public_hash: "TEMP-" + currentUser.id + "-" + Date.now(),
+          valid_from: new Date().toISOString(),
+          status: "active"
+        };
+
+        const { error: digitalError } = await db
+          .from("digital_ids")
+          .insert(digitalId);
+
+        updateProgress(85);
+
+        if (digitalError) {
+          console.warn('Digital ID creation warning:', digitalError);
+          showNotification('Profile created successfully! Digital ID will be generated shortly.', 'success');
+        } else {
+          showNotification('Profile and Digital ID created successfully!', 'success');
+        }
+
+        updateProgress(100);
+
+        // Redirect after success
+        setTimeout(() => {
+          window.location.href = "./trip_manager.html";
+        }, 2500);
+
+      } catch (error) {
+        console.error('Profile creation error:', error);
+        showNotification(error.message || 'Failed to create profile. Please try again.', 'error');
+        updateProgress(0);
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    // Real-time form validation feedback
+    document.getElementById("full_name").addEventListener('input', function() {
+      if (this.value.trim().length > 0) {
+        this.style.borderColor = '#28a745';
+      }
+    });
+
+    document.getElementById("dob").addEventListener('input', function() {
+      if (this.value) {
+        const birthDate = new Date(this.value);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        
+        if (age >= 18) {
+          this.style.borderColor = '#28a745';
+        } else {
+          this.style.borderColor = '#dc3545';
+        }
+      }
+    });
+
+    document.getElementById("kyc_number").addEventListener('input', function() {
+      if (this.value.trim().length > 0) {
+        this.style.borderColor = '#28a745';
+      }
+    });
+  </script>
+</body>
+</html>

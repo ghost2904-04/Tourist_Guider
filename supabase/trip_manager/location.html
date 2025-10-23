@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Tracking - Tourist Safety System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .header .subtitle {
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .main-content {
+      padding: 2.5rem;
+    }
+
+    .status-panel {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e0e0e0;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .tracking-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .status-indicator {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    .status-active {
+      background: #28a745;
+    }
+
+    .status-inactive {
+      background: #dc3545;
+    }
+
+    .status-pending {
+      background: #ffc107;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    }
+
+    .btn-danger:hover {
+      box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    }
+
+    .btn-success:hover {
+      box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e0e0e0;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .card-header h2 {
+      color: #333;
+      font-size: 1.3rem;
+    }
+
+    .current-location {
+      background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+      border: 1px solid #28a745;
+    }
+
+    .current-location.danger {
+      background: linear-gradient(135deg, #f8e8e8 0%, #f8f0f0 100%);
+      border: 1px solid #dc3545;
+    }
+
+    .location-item {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid #667eea;
+    }
+
+    .location-item.danger {
+      border-left-color: #dc3545;
+      background: #fdf2f2;
+    }
+
+    .location-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .location-time {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .location-name {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.25rem;
+    }
+
+    .location-coords {
+      color: #888;
+      font-size: 0.85rem;
+      font-family: monospace;
+    }
+
+    .location-speed {
+      color: #667eea;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .safety-info {
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .safety-info.safe {
+      background: #e8f5e8;
+      color: #28a745;
+    }
+
+    .safety-info.medium {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .safety-info.danger {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .notification {
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      font-weight: 500;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .notification.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .notification.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .notification.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .emergency-panel {
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      color: white;
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .emergency-btn {
+      background: white;
+      color: #dc3545;
+      font-size: 1.2rem;
+      font-weight: 700;
+      padding: 1rem 2rem;
+      margin-top: 1rem;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-item {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #667eea;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-value.danger {
+      color: #dc3545;
+    }
+
+    .stat-label {
+      color: #666;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+
+    .empty-state .icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .safety-zone-alert {
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      animation: alertPulse 2s infinite;
+    }
+
+    @keyframes alertPulse {
+      0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .main-content {
+        padding: 1.5rem;
+      }
+
+      .header {
+        padding: 1.5rem;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container fade-in">
+    <div class="header">
+      <a href="./trip_manager.html" class="back-btn">← Back to Trips</a>
+      <h1>📍 Location Tracking</h1>
+      <p class="subtitle" id="trip-title">Real-time safety monitoring</p>
+    </div>
+
+    <div class="main-content">
+      <!-- Notification area -->
+      <div id="notification" class="notification hidden"></div>
+
+      <!-- Safety Zone Alert -->
+      <div id="safety-alert" class="safety-zone-alert hidden">
+        <h2>🚨 DANGER ZONE DETECTED!</h2>
+        <p>You are in a high-risk area. Please be extra cautious and consider moving to a safer location.</p>
+        <p><strong id="danger-zone-info"></strong></p>
+      </div>
+
+      <!-- Emergency Panel -->
+      <div class="emergency-panel" id="emergency-panel" style="display: none;">
+        <h2>🚨 Emergency Mode Active</h2>
+        <p>Your location is being tracked and emergency contacts have been notified.</p>
+        <button class="emergency-btn btn" onclick="deactivateEmergency()">
+          Deactivate Emergency Mode
+        </button>
+      </div>
+
+      <!-- Status Panel -->
+      <div class="status-panel">
+        <div class="tracking-status">
+          <div class="status-indicator status-inactive" id="status-indicator"></div>
+          <h2 id="tracking-status-text">Location Tracking Inactive</h2>
+        </div>
+        
+        <div class="controls">
+          <button class="btn btn-success" id="start-btn" onclick="startTracking()">
+            <span>▶️</span> Start Tracking
+          </button>
+          <button class="btn btn-danger" id="stop-btn" onclick="stopTracking()" disabled>
+            <span>⏹️</span> Stop Tracking
+          </button>
+          <button class="btn" onclick="getCurrentLocation()">
+            <span>🎯</span> Get Current Location
+          </button>
+          <button class="btn" onclick="debugAppState()">
+            <span>🔍</span> Debug App State
+          </button>
+          <button class="btn" onclick="testFileAccess()">
+            <span>📁</span> Test JSON File
+          </button>
+          <button class="btn" onclick="testSaltLake()">
+            <span>🧪</span> Test Salt Lake Zone
+          </button>
+          <button class="btn btn-danger" onclick="activateEmergency()">
+            <span>🚨</span> Emergency
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-value" id="locations-count">0</div>
+          <div class="stat-label">Locations Recorded</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="tracking-time">0m</div>
+          <div class="stat-label">Tracking Time</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="last-update">--</div>
+          <div class="stat-label">Last Update</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="safety-status">Safe</div>
+          <div class="stat-label">Safety Status</div>
+        </div>
+      </div>
+
+      <!-- Content Grid -->
+      <div class="grid">
+        <!-- Current Location -->
+        <div class="card current-location" id="current-location-card">
+          <div class="card-header">
+            <span style="font-size: 1.5rem;">🎯</span>
+            <h2>Current Location</h2>
+          </div>
+          <div id="map" style="width:100%; height:300px; border-radius:12px; margin-bottom:1rem;"></div>
+          <div id="current-location-content">
+            <div class="empty-state">
+              <div class="icon">📍</div>
+              <h3>Location not available</h3>
+              <p>Start tracking to see your current location</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trip Information -->
+        <div class="card">
+          <div class="card-header">
+            <span style="font-size: 1.5rem;">ℹ️</span>
+            <h2>Trip Information</h2>
+          </div>
+          <div id="trip-info">
+            <p><strong>Trip:</strong> <span id="trip-name">Loading...</span></p>
+            <p><strong>Destination:</strong> <span id="trip-destination">Loading...</span></p>
+            <p><strong>Duration:</strong> <span id="trip-duration">Loading...</span></p>
+            <p><strong>Status:</strong> <span id="trip-status">Loading...</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location History -->
+      <div class="card">
+        <div class="card-header">
+          <span style="font-size: 1.5rem;">📋</span>
+          <h2>Location History</h2>
+          <button class="btn" onclick="exportLocations()" style="margin-left: auto; padding: 8px 16px; font-size: 14px;">
+            💾 Export
+          </button>
+        </div>
+        <div id="location-list">
+          <div class="empty-state">
+            <div class="icon">📍</div>
+            <h3>No locations recorded</h3>
+            <p>Start tracking to see your location history</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+  <script>
+    // Configuration
+    const SUPABASE_URL = "https://martdbudgoflarqthipw.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hcnRkYnVkZ29mbGFycXRoaXB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMzg0NzcsImV4cCI6MjA3MzcxNDQ3N30.XxB8CbFakk_SJBvIC873k8vTh9z82VC1OKG-xQtRMWE";
+    const GOOGLE_MAPS_API_KEY = "AIzaSyB9JtaoGZvW33eY4XrbXYHpKZGrl3YyFBY";
+
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // State management
+    let currentUser = null;
+    let currentTrip = null;
+    let currentDeviceId = null;
+    let trackingInterval = null;
+    let startTime = null;
+    let isTracking = false;
+    let isEmergencyMode = false;
+    let locations = [];
+    let map = null;
+    let marker = null;
+    let historyMarkers = [];
+    let pathPolyline = null;
+    let currentSafetyZone = null;
+
+    // DOM Elements
+    const notificationEl = document.getElementById("notification");
+    const statusIndicator = document.getElementById("status-indicator");
+    const statusText = document.getElementById("tracking-status-text");
+    const startBtn = document.getElementById("start-btn");
+    const stopBtn = document.getElementById("stop-btn");
+    const locationList = document.getElementById("location-list");
+    const currentLocationContent = document.getElementById("current-location-content");
+    const safetyAlert = document.getElementById("safety-alert");
+    const dangerZoneInfo = document.getElementById("danger-zone-info");
+    const currentLocationCard = document.getElementById("current-location-card");
+
+    let geofences = [];
+
+    async function loadGeofences() {
+      try {
+        const response = await fetch("geofences.json");
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.text();
+        geofences = JSON.parse(data);
+        
+        console.log("Geofences loaded successfully:", geofences.length, "cities");
+        
+      } catch (err) {
+        console.error("Error loading geofences from file:", err);
+        console.log("Loading fallback geofences data...");
+        
+        // Complete fallback data from your original file
+        geofences = [
+          {
+            "city": "Cuttack",
+            "zones": [
+              {
+                "zone_name": "Badambadi",
+                "safety_score": 25,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Badambadi\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.856,20.478],[85.857,20.478],[85.857,20.480],[85.856,20.480],[85.856,20.478]]]}}"
+              },
+              {
+                "zone_name": "College Square",
+                "safety_score": 41,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"College Square\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.845,20.464],[85.846,20.464],[85.846,20.466],[85.845,20.466],[85.845,20.464]]]}}"
+              },
+              {
+                "zone_name": "CDA Sector 6",
+                "safety_score": 58,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"CDA Sector 6\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.849,20.500],[85.850,20.500],[85.850,20.502],[85.849,20.502],[85.849,20.500]]]}}"
+              },
+              {
+                "zone_name": "Choudwar",
+                "safety_score": 76,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Choudwar\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.875,20.532],[85.876,20.532],[85.876,20.534],[85.875,20.534],[85.875,20.532]]]}}"
+              },
+              {
+                "zone_name": "Jagatpur",
+                "safety_score": 32,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Jagatpur\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.882,20.485],[85.883,20.485],[85.883,20.487],[85.882,20.487],[85.882,20.485]]]}}"
+              },
+              {
+                "zone_name": "Naya Sarak",
+                "safety_score": 67,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Naya Sarak\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.830,20.473],[85.831,20.473],[85.831,20.475],[85.830,20.475],[85.830,20.473]]]}}"
+              }
+            ]
+          },
+          {
+            "city": "Puri",
+            "zones": [
+              {
+                "zone_name": "Grand Road",
+                "safety_score": 19,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Grand Road\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.818,19.810],[85.819,19.810],[85.819,19.812],[85.818,19.812],[85.818,19.810]]]}}"
+              },
+              {
+                "zone_name": "Sea Beach",
+                "safety_score": 70,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Sea Beach\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.826,19.797],[85.827,19.797],[85.827,19.800],[85.826,19.800],[85.826,19.797]]]}}"
+              },
+              {
+                "zone_name": "Swargadwar",
+                "safety_score": 53,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Swargadwar\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.818,19.799],[85.819,19.799],[85.819,19.801],[85.818,19.801],[85.818,19.799]]]}}"
+              },
+              {
+                "zone_name": "Station Road",
+                "safety_score": 45,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Station Road\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.820,19.821],[85.821,19.821],[85.821,19.823],[85.820,19.823],[85.820,19.821]]]}}"
+              },
+              {
+                "zone_name": "Baliapanda",
+                "safety_score": 27,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Baliapanda\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.820,19.789],[85.821,19.789],[85.821,19.791],[85.820,19.791],[85.820,19.789]]]}}"
+              },
+              {
+                "zone_name": "Chakratirtha",
+                "safety_score": 61,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Chakratirtha\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[85.831,19.818],[85.832,19.818],[85.832,19.820],[85.831,19.820],[85.831,19.818]]]}}"
+              }
+            ]
+          },
+          {
+            "city": "Kolkata",
+            "zones": [
+              {
+                "zone_name": "Park Street",
+                "safety_score": 36,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Park Street\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[88.349,22.549],[88.350,22.549],[88.350,22.551],[88.349,22.551],[88.349,22.549]]]}}"
+              },
+              {
+                "zone_name": "Salt Lake",
+                "safety_score": 22,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Salt Lake\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[88.418,22.579],[88.419,22.579],[88.419,22.581],[88.418,22.581],[88.418,22.579]]]}}"
+              },
+              {
+                "zone_name": "Howrah",
+                "safety_score": 75,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Howrah\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[88.320,22.586],[88.321,22.586],[88.321,22.588],[88.320,22.588],[88.320,22.586]]]}}"
+              },
+              {
+                "zone_name": "New Town",
+                "safety_score": 48,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"New Town\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[88.480,22.598],[88.481,22.598],[88.481,22.600],[88.480,22.600],[88.480,22.598]]]}}"
+              },
+              {
+                "zone_name": "Behala",
+                "safety_score": 59,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Behala\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[88.312,22.501],[88.313,22.501],[88.313,22.503],[88.312,22.503],[88.312,22.501]]]}}"
+              },
+              {
+                "zone_name": "Dum Dum",
+                "safety_score": 30,
+                "geojson_polygon": "{\"type\":\"Feature\",\"properties\":{\"name\":\"Dum Dum\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[88.415,22.629],[88.416,22.629],[88.416,22.631],[88.415,22.631],[88.415,22.629]]]}}"
+              }
+            ]
+          }
+        ];
+        
+        console.log("Fallback geofences loaded:", geofences.length, "cities");
+      }
+    }
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 20.5937, lng: 78.9629 },
+        zoom: 5,
+      });
+
+      // Initialize polyline for location history path
+      pathPolyline = new google.maps.Polyline({
+        path: [],
+        geodesic: true,
+        strokeColor: "#667eea",
+        strokeOpacity: 1.0,
+        strokeWeight: 2,
+        map: map,
+      });
+    }
+
+    function updateMap(lat, lon) {
+      if (!map) return;
+      const pos = { lat: lat, lng: lon };
+
+      if (!marker) {
+        marker = new google.maps.Marker({
+          position: pos,
+          map: map,
+          title: "Your Current Location",
+        });
+      } else {
+        marker.setPosition(pos);
+      }
+
+      map.setCenter(pos);
+      map.setZoom(15);
+    }
+
+    function checkSafetyZone(lat, lon) {
+      if (!geofences || geofences.length === 0) {
+        return null;
+      }
+
+      const point = turf.point([lon, lat]);
+
+      for (const city of geofences) {
+        for (const zone of city.zones) {
+          try {
+            const geo = JSON.parse(zone.geojson_polygon);
+            const polygon = turf.polygon(geo.geometry.coordinates);
+
+            if (turf.booleanPointInPolygon(point, polygon)) {
+              let safety = "medium";
+              if (zone.safety_score < 40) safety = "danger";
+              else if (zone.safety_score >= 70) safety = "safe";
+
+              return {
+                city: city.city,
+                zone: zone.zone_name,
+                safety_score: zone.safety_score,
+                safety
+              };
+            }
+          } catch (error) {
+            console.error(`Error checking zone ${zone.zone_name}:`, error);
+          }
+        }
+      }
+      
+      return null;
+    }
+
+    function updateSafetyStatus(safetyZone) {
+      const safetyStatusEl = document.getElementById('safety-status');
+      const safetyStatusValue = safetyStatusEl.parentElement;
+      
+      if (safetyZone && safetyZone.safety === 'danger') {
+        // Show danger alert
+        safetyAlert.classList.remove('hidden');
+        dangerZoneInfo.textContent = `${safetyZone.zone}, ${safetyZone.city} (Safety Score: ${safetyZone.safety_score})`;
+        
+        // Update safety status
+        safetyStatusEl.textContent = 'DANGER';
+        safetyStatusEl.classList.add('danger');
+        safetyStatusEl.style.color = '#dc3545';
+        
+        // Update current location card styling
+        currentLocationCard.classList.add('danger');
+        
+        // Show notification
+        showNotification(`⚠️ You are in a danger zone: ${safetyZone.zone}`, 'error');
+        
+      } else {
+        // Hide danger alert
+        safetyAlert.classList.add('hidden');
+        
+        // Update safety status
+        if (safetyZone) {
+          if (safetyZone.safety === 'safe') {
+            safetyStatusEl.textContent = 'SAFE';
+            safetyStatusEl.style.color = '#28a745';
+          } else {
+            safetyStatusEl.textContent = 'MODERATE';
+            safetyStatusEl.style.color = '#ffc107';
+          }
+        } else {
+          safetyStatusEl.textContent = isEmergencyMode ? 'Emergency' : 'Unknown';
+          safetyStatusEl.style.color = isEmergencyMode ? '#dc3545' : '#667eea';
+        }
+        
+        safetyStatusEl.classList.remove('danger');
+        currentLocationCard.classList.remove('danger');
+      }
+      
+      currentSafetyZone = safetyZone;
+    }
+
+    function updateCurrentLocation(lat, lon, locationName, speed, safetyZone) {
+      const speedText = speed ? `${(speed * 3.6).toFixed(1)} km/h` : "Stationary";
+
+      let safetyInfo = '';
+      if (safetyZone) {
+        const safetyClass = safetyZone.safety;
+        const safetyText = safetyZone.safety === 'danger' ? 'DANGER ZONE' : 
+                          safetyZone.safety === 'safe' ? 'SAFE ZONE' : 'MODERATE RISK';
+        
+        safetyInfo = `
+          <div class="safety-info ${safetyClass}">
+            🛡️ ${safetyText}: ${safetyZone.zone}, ${safetyZone.city} (Score: ${safetyZone.safety_score})
+          </div>
+        `;
+      }
+
+      currentLocationContent.innerHTML = `
+        <div class="location-item ${safetyZone && safetyZone.safety === 'danger' ? 'danger' : ''}">
+          <div class="location-time">${new Date().toLocaleString()}</div>
+          <div class="location-name">${locationName}</div>
+          <div class="location-coords">${formatCoordinate(lat)}, ${formatCoordinate(lon)}</div>
+          <div class="location-speed">Speed: ${speedText}</div>
+          ${safetyInfo}
+        </div>
+      `;
+
+      updateMap(lat, lon);
+      updateSafetyStatus(safetyZone);
+    }
+
+    function renderLocationHistory() {
+      if (locations.length === 0) {
+        locationList.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">📍</div>
+            <h3>No locations recorded</h3>
+            <p>Start tracking to see your location history</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Clear old markers
+      historyMarkers.forEach(m => m.setMap(null));
+      historyMarkers = [];
+      pathPolyline.setPath([]);
+
+      const locationsHTML = locations.map(location => {
+        const time = new Date(location.recorded_at).toLocaleString();
+        const speed = location.speed ? `${(location.speed * 3.6).toFixed(1)} km/h` : "Stationary";
+        const isDanger = location.safety_response === 3;
+
+        // Add marker for history point
+        const pos = { lat: location.latitude, lng: location.longitude };
+        const marker = new google.maps.Marker({
+          position: pos,
+          map: map,
+          title: `${location.location_name} @ ${time}`,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 5,
+            fillColor: isDanger ? "#dc3545" : "#667eea",
+            fillOpacity: 1,
+            strokeWeight: 0,
+          },
+        });
+        historyMarkers.push(marker);
+
+        // Extend polyline path
+        const path = pathPolyline.getPath();
+        path.push(pos);
+
+        let safetyInfo = '';
+        if (location.safety_zone_info) {
+          const safetyData = JSON.parse(location.safety_zone_info);
+          const safetyClass = safetyData.safety;
+          const safetyText = safetyData.safety === 'danger' ? 'DANGER ZONE' : 
+                            safetyData.safety === 'safe' ? 'SAFE ZONE' : 'MODERATE RISK';
+          
+          safetyInfo = `
+            <div class="safety-info ${safetyClass}">
+              🛡️ ${safetyText}: ${safetyData.zone}, ${safetyData.city} (Score: ${safetyData.safety_score})
+            </div>
+          `;
+        }
+
+        return `
+          <div class="location-item ${isDanger ? 'danger' : ''}">
+            <div class="location-time">${time}</div>
+            <div class="location-name">${location.location_name}</div>
+            <div class="location-coords">${formatCoordinate(location.latitude)}, ${formatCoordinate(location.longitude)}</div>
+            <div class="location-speed">Speed: ${speed}</div>
+            ${safetyInfo}
+          </div>
+        `;
+      }).join("");
+
+      locationList.innerHTML = locationsHTML;
+    }
+
+    // Utility functions
+    function showNotification(message, type = 'info') {
+      notificationEl.className = `notification ${type}`;
+      notificationEl.textContent = message;
+      notificationEl.classList.remove('hidden');
+      notificationEl.classList.add('show');
+      
+      setTimeout(() => {
+        notificationEl.classList.remove('show');
+        setTimeout(() => notificationEl.classList.add('hidden'), 300);
+      }, 5000);
+    }
+
+    function updateTrackingStatus(tracking) {
+      isTracking = tracking;
+      
+      if (tracking) {
+        statusIndicator.className = "status-indicator status-active";
+        statusText.textContent = "Location Tracking Active";
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+      } else {
+        statusIndicator.className = "status-indicator status-inactive";
+        statusText.textContent = "Location Tracking Inactive";
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      }
+    }
+
+    function formatTime(minutes) {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      
+      if (hours > 0) {
+        return `${hours}h ${mins}m`;
+      }
+      return `${mins}m`;
+    }
+
+    function formatCoordinate(coord) {
+      return coord ? coord.toFixed(6) : 'Unknown';
+    }
+
+    function updateStats() {
+      document.getElementById('locations-count').textContent = locations.length;
+      
+      if (startTime && isTracking) {
+        const elapsed = Math.floor((Date.now() - startTime) / (1000 * 60));
+        document.getElementById('tracking-time').textContent = formatTime(elapsed);
+      }
+      
+      if (locations.length > 0) {
+        const lastLocation = locations[0];
+        const lastUpdate = new Date(lastLocation.recorded_at).toLocaleTimeString();
+        document.getElementById('last-update').textContent = lastUpdate;
+      }
+    }
+
+    // Geolocation functions
+    async function reverseGeocode(lat, lon) {
+      try {
+        const response = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${GOOGLE_MAPS_API_KEY}`
+        );
+        const data = await response.json();
+        
+        if (data.status === 'OK' && data.results.length > 0) {
+          return data.results[0].formatted_address;
+        }
+        return `${formatCoordinate(lat)}, ${formatCoordinate(lon)}`;
+      } catch (error) {
+        console.error('Reverse geocoding error:', error);
+        return `${formatCoordinate(lat)}, ${formatCoordinate(lon)}`;
+      }
+    }
+
+    function getCurrentPosition() {
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error('Geolocation is not supported by this browser'));
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          position => resolve(position),
+          error => reject(error),
+          {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 60000
+          }
+        );
+      });
+    }
+
+    // Device management
+    async function registerDevice() {
+      if (currentDeviceId) return currentDeviceId;
+
+      try {
+        // Create new device
+        const os = navigator.userAgent.includes("Android") ? "Android" :
+                  navigator.userAgent.includes("iPhone") ? "iOS" : "Web";
+
+        // Create device data matching your schema
+        const deviceData = {
+          profile_id: currentUser.id,
+          os: os,
+          last_seen: new Date().toISOString()
+        };
+
+        console.log("Attempting to register device:", deviceData);
+
+        const { data, error } = await db
+          .from("devices")
+          .insert(deviceData)
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Database device registration failed:", error);
+          throw error;
+        }
+
+        console.log("Device registered successfully:", data);
+        currentDeviceId = data.id; // Use the UUID generated by the database
+        
+        return currentDeviceId;
+
+      } catch (error) {
+        console.error("Device registration error:", error);
+        
+        // Fallback: create a simple device ID anyway
+        currentDeviceId = `fallback-device-${Date.now()}`;
+        console.log("Using fallback device ID:", currentDeviceId);
+        
+        showNotification("Device registration failed - using fallback ID", 'info');
+        return currentDeviceId;
+      }
+    }
+
+    // Location tracking
+    async function logLocation(lat, lon, speed, locationName, safetyZone) {
+      try {
+        // Determine safety response based on zone
+        let safetyResponse = 1; // Default safe
+        if (safetyZone) {
+          if (safetyZone.safety === 'danger') {
+            safetyResponse = 3; // Danger
+          } else if (safetyZone.safety === 'medium') {
+            safetyResponse = 2; // Medium risk
+          }
+        }
+        if (isEmergencyMode) {
+          safetyResponse = 3; // Emergency always takes precedence
+        }
+
+        const locationData = {
+          trip_id: currentTrip.id,
+          device_id: currentDeviceId,
+          latitude: lat,
+          longitude: lon,
+          speed: speed,
+          location_name: locationName,
+          safety_response: safetyResponse,
+          safety_zone_info: safetyZone ? JSON.stringify(safetyZone) : null,
+          recorded_at: new Date().toISOString()
+        };
+
+        // Try to save to database, but continue even if it fails
+        try {
+          const { error } = await db
+            .from("trip_locations")
+            .insert(locationData);
+
+          if (error) {
+            console.warn("Failed to save location to database:", error);
+            showNotification("Location saved locally only - database unavailable", 'info');
+          } else {
+            console.log("Location saved to database successfully");
+          }
+
+          // Try to update device last_seen, but don't fail if it doesn't work
+          try {
+            await db
+              .from("devices")
+              .update({ last_seen: new Date().toISOString() })
+              .eq("id", currentDeviceId);
+          } catch (updateError) {
+            console.warn("Failed to update device last_seen:", updateError);
+          }
+        } catch (dbError) {
+          console.warn("Database error during location logging:", dbError);
+          showNotification("Location tracking continues locally", 'info');
+        }
+
+        // Add to local array for immediate UI update (this always works)
+        locations.unshift(locationData);
+        
+        // Update UI
+        updateCurrentLocation(lat, lon, locationName, speed, safetyZone);
+        renderLocationHistory();
+        updateStats();
+
+      } catch (error) {
+        console.error("Location logging error:", error);
+        showNotification("Error during location logging: " + error.message, 'error');
+      }
+    }
+
+    async function getCurrentLocation() {
+      try {
+        showNotification('Getting current location...', 'info');
+        
+        const position = await getCurrentPosition();
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const speed = position.coords.speed;
+
+        console.log(`Current coordinates: ${lat}, ${lon}`);
+        
+        const locationName = await reverseGeocode(lat, lon);
+        const safetyZone = checkSafetyZone(lat, lon);
+        
+        console.log('Safety zone check result:', safetyZone);
+        
+        updateCurrentLocation(lat, lon, locationName, speed, safetyZone);
+        showNotification('Location updated successfully!', 'success');
+
+      } catch (error) {
+        console.error('Get location error:', error);
+        showNotification('Error getting location: ' + error.message, 'error');
+      }
+    }
+
+    async function startTracking() {
+      try {
+        console.log("=== START TRACKING DEBUG ===");
+        console.log("currentTrip:", currentTrip);
+        console.log("currentUser:", currentUser);
+        console.log("currentDeviceId:", currentDeviceId);
+        
+        if (!currentTrip) {
+          console.error("No currentTrip found!");
+          showNotification('No active trip found. Trip data:', 'error');
+          
+          // Try to reload trip info
+          console.log("Attempting to reload trip info...");
+          const tripReloaded = await loadTripInfo();
+          if (!tripReloaded) {
+            showNotification('Failed to load trip information', 'error');
+            return;
+          }
+          
+          console.log("Trip reloaded:", currentTrip);
+        }
+
+        if (!currentDeviceId) {
+          console.log("No device ID, registering device...");
+          await registerDevice();
+          if (!currentDeviceId) {
+            showNotification('Failed to register device', 'error');
+            return;
+          }
+          console.log("Device registered:", currentDeviceId);
+        }
+
+        // Test location access first
+        console.log("Testing location access...");
+        await getCurrentPosition();
+        console.log("Location access successful");
+        
+        startTime = Date.now();
+        updateTrackingStatus(true);
+        showNotification('Location tracking started', 'success');
+
+        // Start periodic location updates (every 15 seconds)
+        trackingInterval = setInterval(async () => {
+          try {
+            const position = await getCurrentPosition();
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const speed = position.coords.speed;
+
+            console.log(`Tracking update: ${lat}, ${lon}`);
+            const locationName = await reverseGeocode(lat, lon);
+            const safetyZone = checkSafetyZone(lat, lon);
+            await logLocation(lat, lon, speed, locationName, safetyZone);
+
+          } catch (error) {
+            console.error('Tracking error:', error);
+            showNotification('Tracking error: ' + error.message, 'error');
+          }
+        }, 15000);
+
+        // Update tracking time every minute
+        setInterval(() => {
+          if (isTracking) {
+            updateStats();
+          }
+        }, 60000);
+
+      } catch (error) {
+        console.error('Start tracking error:', error);
+        showNotification('Error starting tracking: ' + error.message, 'error');
+      }
+    }
+
+    function stopTracking() {
+      if (trackingInterval) {
+        clearInterval(trackingInterval);
+        trackingInterval = null;
+      }
+
+      startTime = null;
+      updateTrackingStatus(false);
+      showNotification('Location tracking stopped', 'info');
+      
+      // Hide safety alert when tracking stops
+      safetyAlert.classList.add('hidden');
+      currentLocationCard.classList.remove('danger');
+    }
+
+    // Emergency functions
+    function activateEmergency() {
+      if (!confirm('This will activate emergency mode and notify your emergency contacts. Continue?')) {
+        return;
+      }
+
+      isEmergencyMode = true;
+      document.getElementById('emergency-panel').style.display = 'block';
+      
+      showNotification('Emergency mode activated! Your location is being monitored.', 'error');
+      
+      // Start tracking if not already active
+      if (!isTracking) {
+        startTracking();
+      }
+      
+      // Update safety status
+      updateSafetyStatus(currentSafetyZone);
+    }
+
+    function deactivateEmergency() {
+      isEmergencyMode = false;
+      document.getElementById('emergency-panel').style.display = 'none';
+      
+      showNotification('Emergency mode deactivated', 'success');
+      
+      // Update safety status
+      updateSafetyStatus(currentSafetyZone);
+    }
+
+    // Data loading and rendering
+    async function loadTripInfo() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tripId = urlParams.get('trip');
+
+      if (!tripId) {
+        showNotification('No trip ID provided in URL. Please select a trip from the trip manager.', 'error');
+        
+        // Create a demo trip for testing if no trip ID is provided
+        console.log("No trip ID found, creating demo trip...");
+        currentTrip = {
+          id: "demo-trip-123",
+          trip_name: "Demo Safety Trip",
+          destination: "Cuttack, Odisha",
+          start_date: new Date().toISOString(),
+          end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+          profile_id: currentUser.id
+        };
+        
+        // Update UI with demo trip
+        document.getElementById('trip-title').textContent = `Tracking: ${currentTrip.trip_name}`;
+        document.getElementById('trip-name').textContent = currentTrip.trip_name;
+        document.getElementById('trip-destination').textContent = currentTrip.destination;
+        document.getElementById('trip-duration').textContent = "7 days";
+        document.getElementById('trip-status').textContent = "Active (Demo)";
+        
+        showNotification('Using demo trip for testing. Location tracking is ready!', 'info');
+        return true;
+      }
+
+      try {
+        console.log("Loading trip with ID:", tripId);
+        const { data, error } = await db
+          .from("trips")
+          .select("*")
+          .eq("id", tripId)
+          .eq("profile_id", currentUser.id)
+          .single();
+
+        if (error) {
+          console.error("Supabase error:", error);
+          throw new Error(`Database error: ${error.message}`);
+        }
+
+        if (!data) {
+          throw new Error('Trip not found or you do not have access to this trip');
+        }
+
+        currentTrip = data;
+        console.log("Trip loaded successfully:", currentTrip);
+        
+        // Update UI
+        document.getElementById('trip-title').textContent = `Tracking: ${data.trip_name || 'Unnamed Trip'}`;
+        document.getElementById('trip-name').textContent = data.trip_name || 'Unnamed Trip';
+        document.getElementById('trip-destination').textContent = data.destination || 'Not specified';
+        
+        const startDate = new Date(data.start_date);
+        const endDate = new Date(data.end_date);
+        const duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+        document.getElementById('trip-duration').textContent = `${duration} days`;
+        
+        const now = new Date();
+        let status = 'Unknown';
+        if (now < startDate) status = 'Upcoming';
+        else if (now >= startDate && now <= endDate) status = 'Active';
+        else status = 'Completed';
+        
+        document.getElementById('trip-status').textContent = status;
+
+        return true;
+
+      } catch (error) {
+        console.error('Load trip error:', error);
+        showNotification(`Error loading trip: ${error.message}. Using demo trip instead.`, 'error');
+        
+        // Fall back to demo trip
+        currentTrip = {
+          id: tripId || "demo-trip-123",
+          trip_name: "Demo Safety Trip",
+          destination: "Cuttack, Odisha", 
+          start_date: new Date().toISOString(),
+          end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          profile_id: currentUser.id
+        };
+        
+        // Update UI with demo trip
+        document.getElementById('trip-title').textContent = `Tracking: ${currentTrip.trip_name}`;
+        document.getElementById('trip-name').textContent = currentTrip.trip_name;
+        document.getElementById('trip-destination').textContent = currentTrip.destination;
+        document.getElementById('trip-duration').textContent = "7 days";
+        document.getElementById('trip-status').textContent = "Active (Demo)";
+        
+        return true;
+      }
+    }
+
+    async function loadLocationHistory() {
+      if (!currentTrip) return;
+
+      try {
+        const { data, error } = await db
+          .from("trip_locations")
+          .select("*")
+          .eq("trip_id", currentTrip.id)
+          .order("recorded_at", { ascending: false })
+          .limit(50);
+
+        if (error) throw error;
+
+        locations = data || [];
+        renderLocationHistory();
+        updateStats();
+
+        // If we have locations, check the latest one for safety status
+        if (locations.length > 0) {
+          const latestLocation = locations[0];
+          if (latestLocation.safety_zone_info) {
+            const safetyZone = JSON.parse(latestLocation.safety_zone_info);
+            updateSafetyStatus(safetyZone);
+          }
+        }
+
+      } catch (error) {
+        console.error('Load locations error:', error);
+        showNotification('Error loading location history', 'error');
+      }
+    }
+
+    function exportLocations() {
+      if (locations.length === 0) {
+        showNotification('No locations to export', 'error');
+        return;
+      }
+
+      const exportData = {
+        trip: currentTrip,
+        locations: locations,
+        exported_at: new Date().toISOString()
+      };
+
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      const exportFileName = `trip-${currentTrip.id}-locations.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileName);
+      linkElement.click();
+      
+      showNotification('Location data exported successfully!', 'success');
+    }
+
+    // Add test functions for debugging safety zones
+    window.testCoordinates = function(lat, lon) {
+      console.log(`\n=== TESTING COORDINATES: ${lat}, ${lon} ===`);
+      const result = checkSafetyZone(lat, lon);
+      console.log('Final result:', result);
+      
+      if (result) {
+        updateSafetyStatus(result);
+        showNotification(`Test result: ${result.safety.toUpperCase()} zone - ${result.zone}, ${result.city} (Score: ${result.safety_score})`, 
+          result.safety === 'danger' ? 'error' : result.safety === 'safe' ? 'success' : 'info');
+      } else {
+        console.log('No zone found for these coordinates');
+        showNotification('No safety zone found for these coordinates', 'info');
+      }
+      
+      return result;
+    };
+
+    // Add button to test Salt Lake coordinates
+    window.testSaltLake = function() {
+      console.log('\n=== TESTING SALT LAKE COORDINATES ===');
+      return testCoordinates(22.579, 88.418);
+    };
+
+    // Add debug function to check current state
+    window.debugAppState = function() {
+      console.log("\n=== APP STATE DEBUG ===");
+      console.log("currentUser:", currentUser);
+      console.log("currentTrip:", currentTrip);
+      console.log("currentDeviceId:", currentDeviceId);
+      console.log("geofences loaded:", geofences?.length || 0);
+      console.log("isTracking:", isTracking);
+      console.log("isEmergencyMode:", isEmergencyMode);
+      
+      if (currentTrip) {
+        console.log("Trip details:");
+        console.log("- ID:", currentTrip.id);
+        console.log("- Name:", currentTrip.trip_name);
+        console.log("- Destination:", currentTrip.destination);
+      } else {
+        console.log("❌ NO TRIP LOADED!");
+      }
+      
+      return {
+        user: currentUser,
+        trip: currentTrip,
+        device: currentDeviceId,
+        geofences: geofences?.length || 0,
+        tracking: isTracking
+      };
+    };
+
+    // Add test function to check if JSON file is accessible
+    window.testFileAccess = async function() {
+      try {
+        const response = await fetch("geofences.json");
+        console.log("Fetch response:", response.status, response.statusText);
+        const text = await response.text();
+        console.log("File content length:", text.length);
+        console.log("First 200 chars:", text.substring(0, 200));
+        return { status: response.status, length: text.length, accessible: true };
+      } catch (error) {
+        console.error("File access error:", error);
+        return { error: error.message, accessible: false };
+      }
+    };
+
+    // Initialize app
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        await loadGeofences();
+        
+        // Check authentication - try Supabase first, then fall back to mock
+        try {
+          const { data: { user }, error: userError } = await db.auth.getUser();
+          if (user) {
+            currentUser = user;
+          } else {
+            // Use mock user for demonstration
+            currentUser = { id: "user-123", email: "user@example.com" };
+            console.log("Using mock user for demonstration");
+          }
+        } catch (authError) {
+          // If Supabase auth fails, use mock user
+          currentUser = { id: "user-123", email: "user@example.com" };
+          console.log("Supabase auth failed, using mock user:", authError);
+        }
+
+    // Initialize app
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        await loadGeofences();
+        
+        // Check authentication - try Supabase first
+        try {
+          const { data: { user }, error: userError } = await db.auth.getUser();
+          if (user) {
+            currentUser = user;
+            console.log("User authenticated:", user.email);
+          } else {
+            showNotification('Please log in to access this page', 'error');
+            setTimeout(() => {
+              window.location.href = "./index.html";
+            }, 2000);
+            return;
+          }
+        } catch (authError) {
+          console.error("Authentication error:", authError);
+          showNotification('Authentication failed. Redirecting to login...', 'error');
+          setTimeout(() => {
+            window.location.href = "./index.html";
+          }, 2000);
+          return;
+        }
+
+        // Load trip information
+        const tripLoaded = await loadTripInfo();
+        if (!tripLoaded) {
+          console.error("Failed to load trip information");
+          return;
+        }
+
+        // Register device
+        await registerDevice();
+
+        // Load location history
+        await loadLocationHistory();
+
+        showNotification('Location tracking ready', 'success');
+
+      } catch (error) {
+        console.error('Initialization error:', error);
+        showNotification('Error initializing tracking system: ' + error.message, 'error');
+      }
+    });
+
+        // Register device
+        await registerDevice();
+
+        // Load location history
+        await loadLocationHistory();
+
+        showNotification('Location tracking ready', 'success');
+
+      } catch (error) {
+        console.error('Initialization error:', error);
+        showNotification('Error initializing tracking system', 'error');
+      }
+    });
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (trackingInterval) {
+        clearInterval(trackingInterval);
+      }
+    });
+  </script>
+  <script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB9JtaoGZvW33eY4XrbXYHpKZGrl3YyFBY&callback=initMap">
+  </script>
+</body>
+</html>

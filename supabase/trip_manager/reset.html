@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Password - Tourist Safety System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 450px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .logo {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      margin: 0 auto 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    h1 {
+      color: #333;
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #555;
+      font-weight: 500;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: #fafafa;
+    }
+
+    input[type="password"]:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #666;
+      font-size: 18px;
+      user-select: none;
+    }
+
+    .password-toggle:hover {
+      color: #667eea;
+    }
+
+    .password-strength {
+      margin-top: 0.5rem;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+
+    .strength-weak {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .strength-medium {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+
+    .strength-strong {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #667eea;
+      border: 2px solid #667eea;
+      margin-top: 1rem;
+    }
+
+    .btn-secondary:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    .notification {
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .notification.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .notification.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .notification.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .info-box {
+      background: #e8f4fd;
+      border: 1px solid #b8daff;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .info-box h3 {
+      color: #0c5460;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .info-box p {
+      color: #0c5460;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .requirements {
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    .requirements h4 {
+      color: #333;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .requirements ul {
+      margin: 0;
+      padding-left: 1.2rem;
+    }
+
+    .requirements li {
+      color: #666;
+      font-size: 0.85rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .requirements li.valid {
+      color: #28a745;
+    }
+
+    .requirements li.invalid {
+      color: #dc3545;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 2rem 1.5rem;
+        margin: 0 10px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container fade-in">
+    <div class="header">
+      <div class="logo">🔐</div>
+      <h1>Reset Password</h1>
+      <p class="subtitle">Create a new secure password for your account</p>
+    </div>
+
+    <!-- Notification area -->
+    <div id="notification" class="notification hidden"></div>
+
+    <!-- Info box -->
+    <div class="info-box">
+      <h3>🛡️ Password Security</h3>
+      <p>Choose a strong password to protect your tourist safety profile and trip data.</p>
+    </div>
+
+    <form id="reset-form">
+      <div class="form-group">
+        <label for="new-password">New Password</label>
+        <div style="position: relative;">
+          <input id="new-password" type="password" placeholder="Enter your new password" required>
+          <span class="password-toggle" onclick="togglePassword('new-password')">👁️</span>
+        </div>
+        <div id="password-strength" class="password-strength hidden"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirm-password">Confirm New Password</label>
+        <div style="position: relative;">
+          <input id="confirm-password" type="password" placeholder="Confirm your new password" required>
+          <span class="password-toggle" onclick="togglePassword('confirm-password')">👁️</span>
+        </div>
+      </div>
+
+      <!-- Password Requirements -->
+      <div class="requirements">
+        <h4>Password Requirements:</h4>
+        <ul id="requirements-list">
+          <li id="req-length">At least 6 characters long</li>
+          <li id="req-uppercase">Contains uppercase letter (recommended)</li>
+          <li id="req-lowercase">Contains lowercase letter (recommended)</li>
+          <li id="req-number">Contains number (recommended)</li>
+          <li id="req-special">Contains special character (recommended)</li>
+        </ul>
+      </div>
+
+      <button type="submit" class="btn" id="update-btn">
+        <span class="btn-text">Update Password</span>
+      </button>
+
+      <a href="./index.html" class="btn btn-secondary" style="text-decoration: none; display: block; text-align: center;">
+        Back to Login
+      </a>
+    </form>
+  </div>
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    // Configuration
+    const SUPABASE_URL = "https://martdbudgoflarqthipw.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hcnRkYnVkZ29mbGFycXRoaXB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxMzg0NzcsImV4cCI6MjA3MzcxNDQ3N30.XxB8CbFakk_SJBvIC873k8vTh9z82VC1OKG-xQtRMWE";
+
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // DOM Elements
+    const form = document.getElementById('reset-form');
+    const notificationEl = document.getElementById('notification');
+    const updateBtn = document.getElementById('update-btn');
+    const newPasswordInput = document.getElementById('new-password');
+    const confirmPasswordInput = document.getElementById('confirm-password');
+    const strengthEl = document.getElementById('password-strength');
+
+    let isLoading = false;
+
+    // Utility functions
+    function showNotification(message, type = 'info') {
+      notificationEl.className = `notification ${type}`;
+      notificationEl.textContent = message;
+      notificationEl.classList.remove('hidden');
+      notificationEl.classList.add('show');
+      
+      setTimeout(() => {
+        notificationEl.classList.remove('show');
+        setTimeout(() => notificationEl.classList.add('hidden'), 300);
+      }, 5000);
+    }
+
+    function setLoading(loading) {
+      isLoading = loading;
+      
+      if (loading) {
+        updateBtn.innerHTML = '<span class="loading"></span>Updating Password...';
+        updateBtn.disabled = true;
+      } else {
+        updateBtn.innerHTML = '<span class="btn-text">Update Password</span>';
+        updateBtn.disabled = false;
+      }
+    }
+
+    function togglePassword(inputId) {
+      const input = document.getElementById(inputId);
+      const toggle = input.nextElementSibling;
+      
+      const type = input.type === 'password' ? 'text' : 'password';
+      input.type = type;
+      toggle.textContent = type === 'password' ? '👁️' : '🙈';
+    }
+
+    function validatePassword(password) {
+      const requirements = {
+        length: password.length >= 6,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /\d/.test(password),
+        special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+      };
+
+      // Update visual requirements
+      document.getElementById('req-length').className = requirements.length ? 'valid' : 'invalid';
+      document.getElementById('req-uppercase').className = requirements.uppercase ? 'valid' : 'invalid';
+      document.getElementById('req-lowercase').className = requirements.lowercase ? 'valid' : 'invalid';
+      document.getElementById('req-number').className = requirements.number ? 'valid' : 'invalid';
+      document.getElementById('req-special').className = requirements.special ? 'valid' : 'invalid';
+
+      // Calculate strength
+      let strength = 0;
+      if (requirements.length) strength++;
+      if (requirements.uppercase) strength++;
+      if (requirements.lowercase) strength++;
+      if (requirements.number) strength++;
+      if (requirements.special) strength++;
+
+      return { requirements, strength };
+    }
+
+    function updatePasswordStrength() {
+      const password = newPasswordInput.value;
+      
+      if (!password) {
+        strengthEl.classList.add('hidden');
+        return;
+      }
+
+      const { requirements, strength } = validatePassword(password);
+      
+      strengthEl.classList.remove('hidden');
+      
+      if (!requirements.length) {
+        strengthEl.className = 'password-strength strength-weak';
+        strengthEl.textContent = '❌ Password too short (minimum 6 characters)';
+      } else if (strength <= 2) {
+        strengthEl.className = 'password-strength strength-weak';
+        strengthEl.textContent = '⚠️ Weak password - consider adding more character types';
+      } else if (strength <= 4) {
+        strengthEl.className = 'password-strength strength-medium';
+        strengthEl.textContent = '✅ Good password strength';
+      } else {
+        strengthEl.className = 'password-strength strength-strong';
+        strengthEl.textContent = '🔒 Excellent password strength';
+      }
+    }
+
+    function validateForm() {
+      const newPassword = newPasswordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+
+      if (!newPassword) {
+        showNotification('Please enter a new password', 'error');
+        newPasswordInput.focus();
+        return false;
+      }
+
+      if (newPassword.length < 6) {
+        showNotification('Password must be at least 6 characters long', 'error');
+        newPasswordInput.focus();
+        return false;
+      }
+
+      if (!confirmPassword) {
+        showNotification('Please confirm your new password', 'error');
+        confirmPasswordInput.focus();
+        return false;
+      }
+
+      if (newPassword !== confirmPassword) {
+        showNotification('Passwords do not match', 'error');
+        confirmPasswordInput.focus();
+        return false;
+      }
+
+      return true;
+    }
+
+    async function updatePassword() {
+      if (!validateForm()) return;
+
+      setLoading(true);
+
+      try {
+        const { error } = await db.auth.updateUser({
+          password: newPasswordInput.value
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        showNotification('Password updated successfully!', 'success');
+        
+        // Clear form
+        form.reset();
+        strengthEl.classList.add('hidden');
+        
+        // Reset requirements styling
+        document.querySelectorAll('#requirements-list li').forEach(li => {
+          li.className = '';
+        });
+
+        // Redirect after success
+        setTimeout(() => {
+          window.location.href = './index.html';
+        }, 2000);
+
+      } catch (error) {
+        console.error('Password update error:', error);
+        
+        if (error.message.includes('Auth session missing')) {
+          showNotification('Session expired. Please request a new password reset link.', 'error');
+          setTimeout(() => {
+            window.location.href = './index.html';
+          }, 3000);
+        } else if (error.message.includes('same as the old password')) {
+          showNotification('New password must be different from your current password', 'error');
+        } else {
+          showNotification('Failed to update password: ' + error.message, 'error');
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // Event listeners
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!isLoading) {
+        updatePassword();
+      }
+    });
+
+    newPasswordInput.addEventListener('input', updatePasswordStrength);
+
+    confirmPasswordInput.addEventListener('input', () => {
+      const newPassword = newPasswordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+      
+      if (confirmPassword && newPassword !== confirmPassword) {
+        confirmPasswordInput.style.borderColor = '#dc3545';
+      } else if (confirmPassword) {
+        confirmPasswordInput.style.borderColor = '#28a745';
+      } else {
+        confirmPasswordInput.style.borderColor = '#e0e0e0';
+      }
+    });
+
+    // Check if user has valid session for password reset
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const { data, error } = await db.auth.getSession();
+        
+        if (error || !data.session) {
+          showNotification('Invalid or expired reset link. Redirecting to login...', 'error');
+          setTimeout(() => {
+            window.location.href = './index.html';
+          }, 3000);
+          return;
+        }
+
+        showNotification('Session verified. You can now update your password.', 'success');
+        
+      } catch (error) {
+        console.error('Session check error:', error);
+        showNotification('Error verifying session. Please try again.', 'error');
+        setTimeout(() => {
+          window.location.href = './index.html';
+        }, 3000);
+      }
+    });
+  </script>
+</body>
+</html>
